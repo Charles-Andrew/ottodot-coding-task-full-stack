@@ -59,25 +59,41 @@ export default function Home() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [topic, setTopic] = useState<string>("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+  const [currentProblemDifficulty, setCurrentProblemDifficulty] = useState<string>("");
 
   // Load saved problem from localStorage on mount
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('current_math_problem');
-      if (saved) {
-        const data = JSON.parse(saved);
-        const isExpired = Date.now() - data.timestamp > 24 * 60 * 60 * 1000; // 24 hours
-        if (!isExpired && data.sessionId && data.problem_text) {
-          setProblem({ problem_text: data.problem_text, final_answer: 0 });
-          setSessionId(data.sessionId);
-          setTopic(data.topic || "");
-        } else {
-          localStorage.removeItem('current_math_problem');
+    const loadSavedProblem = async () => {
+      try {
+        const saved = localStorage.getItem('current_math_problem');
+        if (saved) {
+          const data = JSON.parse(saved);
+          const isExpired = Date.now() - data.timestamp > 24 * 60 * 60 * 1000; // 24 hours
+          if (!isExpired && data.sessionId) {
+            // Fetch problem details from API
+            const res = await fetch(`/api/math-problem?sessionId=${data.sessionId}`);
+            if (res.ok) {
+              const problemData = await res.json();
+              setProblem({ problem_text: problemData.problem_text, final_answer: 0 });
+              setSessionId(data.sessionId);
+              setTopic(problemData.topic || "");
+              setCurrentProblemDifficulty(problemData.difficulty || 'N/A');
+            } else {
+              // Problem not found or expired, clear localStorage
+              localStorage.removeItem('current_math_problem');
+            }
+          } else {
+            localStorage.removeItem('current_math_problem');
+          }
         }
+      } catch (error) {
+        console.warn('Failed to load saved problem:', error);
+        localStorage.removeItem('current_math_problem');
       }
-    } catch (error) {
-      console.warn('Failed to load saved problem:', error);
-    }
+    };
+
+    loadSavedProblem();
   }, []);
 
   const generateProblem = async () => {
@@ -90,9 +106,14 @@ export default function Home() {
 
     setIsGenerating(true);
     try {
-      const res = await fetch("/api/math-problem", { method: "POST" });
+      const res = await fetch("/api/math-problem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ difficulty: selectedDifficulty })
+      });
       if (!res.ok) throw new Error("Failed to generate problem");
       const data = await res.json();
+      setCurrentProblemDifficulty(data.difficulty || 'N/A');
       setProblem({ problem_text: data.problem_text, final_answer: 0 });
       setSessionId(data.sessionId);
       setTopic(data.topic || "");
@@ -103,8 +124,6 @@ export default function Home() {
       try {
         localStorage.setItem('current_math_problem', JSON.stringify({
           sessionId: data.sessionId,
-          problem_text: data.problem_text,
-          topic: data.topic || "",
           timestamp: Date.now()
         }));
       } catch (error) {
@@ -168,6 +187,28 @@ export default function Home() {
         </div>
 
         <div className="bg-black/80 rounded-3xl p-6 md:p-8 mb-8 shadow-2xl backdrop-blur-xl border border-white/10 bg-gradient-to-br from-indigo-500/15 to-purple-600/15">
+          <div className="mb-6">
+            <label className="block font-semibold text-lg mb-3 text-white">Select Difficulty Level</label>
+            <div className="flex flex-col sm:flex-row gap-3">
+              {(['easy', 'medium', 'hard'] as const).map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setSelectedDifficulty(level)}
+                  className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                    selectedDifficulty === level
+                      ? level === 'easy'
+                        ? 'bg-green-600 text-white shadow-lg'
+                        : level === 'medium'
+                        ? 'bg-yellow-600 text-white shadow-lg'
+                        : 'bg-red-600 text-white shadow-lg'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  {level.charAt(0).toUpperCase() + level.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
           <button
             onClick={generateProblem}
             disabled={isGenerating}
@@ -205,11 +246,10 @@ export default function Home() {
               </div>
               <h2 className="text-2xl font-bold text-white">Problem</h2>
             </div>
-            {topic && (
-              <div className="mb-4 text-sm text-white/70 bg-gray-800/50 p-3 rounded-lg">
-                <strong>Topic:</strong> {topic}
-              </div>
-            )}
+            <div className="mb-4 text-sm text-white/70 bg-gray-800/50 p-3 rounded-lg space-y-1">
+              {topic && <div><strong>Topic:</strong> {topic}</div>}
+              <div><strong>Difficulty:</strong> {currentProblemDifficulty ? currentProblemDifficulty.charAt(0).toUpperCase() + currentProblemDifficulty.slice(1) : 'N/A'}</div>
+            </div>
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl text-lg leading-relaxed mb-8 border-l-4 border-indigo-500 text-white">
               {problem.problem_text}
             </div>
