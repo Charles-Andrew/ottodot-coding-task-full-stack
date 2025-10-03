@@ -6,10 +6,9 @@ import path from 'path';
 
 export async function POST(request: NextRequest) {
   try {
-    const { difficulty } = await request.json();
+    const { difficulty, problem_type, topic } = await request.json();
     const validDifficulties = ['easy', 'medium', 'hard'];
     const selectedDifficulty = validDifficulties.includes(difficulty) ? difficulty : 'medium';
-    console.log('API received difficulty:', difficulty, 'selected:', selectedDifficulty);
 
     const apiKey = process.env.GOOGLE_API_KEY;
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -17,23 +16,12 @@ export async function POST(request: NextRequest) {
     if (!apiKey) throw new Error('GOOGLE_API_KEY not set');
     if (!supabaseUrl || !supabaseKey) throw new Error('Supabase environment variables not set');
 
-    // Load and select random topic
-    let selectedTopic = '';
-    try {
-      const topicsPath = path.join(process.cwd(), 'data', 'primary-5-topics.json');
-      const topicsData = fs.readFileSync(topicsPath, 'utf8');
-      const topicsJson = JSON.parse(topicsData);
-      const topics = topicsJson.primary_5_topics;
-      if (topics && topics.length > 0) {
-        selectedTopic = topics[Math.floor(Math.random() * topics.length)];
-      }
-    } catch (error) {
-      console.warn('Failed to load topics, using general prompt:', error.message);
-    }
+    // Use provided topic or fallback to empty string
+    const selectedTopic = topic || '';
 
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    const prompt = `Generate a ${selectedDifficulty} level math word problem suitable for a Primary 5 student${selectedTopic ? ` on the topic: ${selectedTopic}` : ''}.
+    const prompt = `Generate a ${selectedDifficulty} level Primary 5 ${problem_type} problem${selectedTopic ? ` about ${selectedTopic}` : ''}.
 
 Return ONLY this JSON format: {"problem_text": "the problem text", "final_answer": 4.65}
 - problem_text: the math problem as a string
@@ -68,7 +56,7 @@ Return ONLY this JSON format: {"problem_text": "the problem text", "final_answer
 
     const { data: session, error } = await supabase
       .from('math_problem_sessions')
-      .insert({ problem_text: data.problem_text, correct_answer: data.final_answer, difficulty: selectedDifficulty, topic: selectedTopic })
+      .insert({ problem_text: data.problem_text, correct_answer: data.final_answer, difficulty: selectedDifficulty, problem_type: problem_type, topic: selectedTopic })
       .select('id')
       .single();
 
@@ -77,7 +65,7 @@ Return ONLY this JSON format: {"problem_text": "the problem text", "final_answer
       throw new Error(`Database insert failed: ${error.message}`);
     }
 
-    return NextResponse.json({ sessionId: session.id, problem_text: data.problem_text, topic: selectedTopic, difficulty: selectedDifficulty });
+    return NextResponse.json({ sessionId: session.id, problem_text: data.problem_text, problem_type: problem_type, topic: selectedTopic, difficulty: selectedDifficulty });
   } catch (error) {
     console.error('Error in generate-problem:', error);
     return NextResponse.json({
@@ -98,7 +86,7 @@ export async function GET(request: NextRequest) {
 
     const { data: session, error } = await supabase
       .from('math_problem_sessions')
-      .select('problem_text, topic, difficulty')
+      .select('problem_text, problem_type, topic, difficulty')
       .eq('id', sessionId)
       .single();
 
