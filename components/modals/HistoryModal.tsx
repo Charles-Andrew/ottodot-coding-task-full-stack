@@ -1,5 +1,5 @@
 import { CheckIcon, XIcon, CloseIcon, ClockIcon } from "@/components/icons";
-import { HistoryItemSkeleton, LoadingSpinner } from "@/components/ui/loading";
+import { HistoryItemSkeleton } from "@/components/ui/loading";
 import { SafeHtmlWithMath } from "@/components/ui/SafeHtmlWithMath";
 
 interface HistorySubmission {

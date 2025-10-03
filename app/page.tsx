@@ -1,26 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  CheckIcon,
-  XIcon,
-  CopyIcon,
-  PlusIcon,
-  EndIcon,
-  JoinIcon,
-  SparklesIcon,
-  SendIcon,
-  ClockIcon,
-  WarningIcon,
-  CloseIcon,
-  DocumentIcon,
-} from "@/components/icons";
-import {
-  LoadingSpinner,
-  SkeletonLoader,
-  HistoryItemSkeleton,
-  SessionSkeleton,
-} from "@/components/ui/loading";
+
+import { SessionSkeleton } from "@/components/ui/loading";
 import { Toast } from "@/components/ui/toast";
 import { HistoryModal } from "@/components/modals/HistoryModal";
 
@@ -90,6 +72,8 @@ export default function Home() {
   const [isJoiningSession, setIsJoiningSession] = useState(false);
   const [joinSessionId, setJoinSessionId] = useState("");
 
+  // Loading states for data restoration
+
   // Feedback modal state
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [feedbackModalLoading, setFeedbackModalLoading] = useState(false);
@@ -126,7 +110,7 @@ export default function Home() {
   };
 
   // Function to get filtered topics based on problem type
-  const getFilteredTopics = useCallback((allTopics: string[], problemType: string): string[] => {
+  const getFilteredTopics = useCallback((allTopics: string[]): string[] => {
     // For now, return all topics since most math topics can work with any operation
     // The AI will generate appropriate problems based on the topic and operation type
     return allTopics;
@@ -172,7 +156,7 @@ export default function Home() {
               setTopic(problemData.topic ? (topicMapping[problemData.topic] || problemData.topic) : "");
               setCurrentProblemDifficulty(problemData.difficulty || "N/A");
               setCurrentProblemType(problemData.problem_type || "");
-              // Note: Filter selections (problem type, topic, difficulty) are not restored from localStorage
+              // Note: Filter selections (operation type, topic, difficulty) are not restored from localStorage
               // They should reset to defaults on each page load for a fresh start
             } else {
               // Problem not found or expired, clear localStorage
@@ -185,6 +169,13 @@ export default function Home() {
       } catch (error) {
         console.warn("Failed to load saved problem:", error);
         localStorage.removeItem("current_math_problem");
+        showToastNotification("Could not restore previous problem.", "error");
+        // Reset problem state to clean slate
+        setProblem(null);
+        setSessionId(null);
+        setTopic("");
+        setCurrentProblemDifficulty("");
+        setCurrentProblemType("");
       }
     };
 
@@ -220,6 +211,10 @@ export default function Home() {
       } catch (error) {
         console.warn("Failed to load session:", error);
         localStorage.removeItem("current_session_id");
+        showToastNotification("Could not restore previous session.", "error");
+        // Reset session state
+        setCurrentSessionId(null);
+        setSessionData(null);
       } finally {
         setIsLoadingSession(false);
         setIsInitialLoading(false);
@@ -244,6 +239,9 @@ export default function Home() {
         }
       } catch (error) {
         console.warn("Failed to load topics:", error);
+        // Fallback to empty array
+        setTopics([]);
+        showToastNotification("Could not load topic options. Using basic topics only.", "error");
       }
     };
 
@@ -445,6 +443,7 @@ export default function Home() {
       setCurrentHistoryPage(data.pagination.currentPage);
     } catch (error) {
       console.error("Failed to fetch history:", error);
+      showToastNotification("Failed to load history. Please try again.", "error");
     } finally {
       setIsLoadingHistory(false);
     }
@@ -642,7 +641,7 @@ export default function Home() {
               setSelectedProblemType={setSelectedProblemType}
               selectedTopic={selectedTopic}
               setSelectedTopic={setSelectedTopic}
-              topics={getFilteredTopics(topics, selectedProblemType)}
+              topics={getFilteredTopics(topics)}
               topicMapping={topicMapping}
               generateProblem={generateProblem}
               isGenerating={isGenerating}

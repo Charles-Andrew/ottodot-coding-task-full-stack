@@ -19,7 +19,7 @@ export const SafeHtmlWithMath = ({ html, className = '' }: SafeHtmlWithMathProps
             throwOnError: false,
             errorColor: '#ff6b6b'
           });
-        } catch (error) {
+        } catch {
           return `<span style="color: #ff6b6b;">Math error: ${math}</span>`;
         }
       });
@@ -32,7 +32,7 @@ export const SafeHtmlWithMath = ({ html, className = '' }: SafeHtmlWithMathProps
             throwOnError: false,
             errorColor: '#ff6b6b'
           });
-        } catch (error) {
+        } catch {
           return `<span style="color: #ff6b6b;">Math error: ${math}</span>`;
         }
       });
