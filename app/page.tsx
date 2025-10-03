@@ -73,6 +73,7 @@ export default function Home() {
   >("random");
   const [selectedTopic, setSelectedTopic] = useState<string>("");
   const [topics, setTopics] = useState<string[]>([]);
+  const [topicMapping, setTopicMapping] = useState<Record<string, string>>({});
 
   // Session state management
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -234,7 +235,11 @@ export default function Home() {
         const res = await fetch("/data/primary-5-topics.json");
         if (res.ok) {
           const data = await res.json();
-          setTopics(data.primary_5_topics);
+          // Convert object to array of keys for easier handling
+          const topicKeys = Object.keys(data.primary_5_topics);
+          setTopics(topicKeys);
+          // Store the full mapping for display purposes
+          setTopicMapping(data.primary_5_topics);
         }
       } catch (error) {
         console.warn("Failed to load topics:", error);
@@ -645,6 +650,7 @@ export default function Home() {
               selectedTopic={selectedTopic}
               setSelectedTopic={setSelectedTopic}
               topics={getFilteredTopics(topics, selectedProblemType)}
+              topicMapping={topicMapping}
               generateProblem={generateProblem}
               isGenerating={isGenerating}
             />

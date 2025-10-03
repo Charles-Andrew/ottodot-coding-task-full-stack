@@ -16,8 +16,19 @@ export async function POST(request: NextRequest) {
     if (!apiKey) throw new Error('GOOGLE_API_KEY not set');
     if (!supabaseUrl || !supabaseKey) throw new Error('Supabase environment variables not set');
 
-    // Use provided topic or fallback to empty string
-    const selectedTopic = topic || '';
+    // Load topic mapping and convert key to display name
+    let selectedTopic = '';
+    if (topic && topic !== 'random') {
+      try {
+        const topicsPath = path.join(process.cwd(), 'public', 'data', 'primary-5-topics.json');
+        const topicsData = fs.readFileSync(topicsPath, 'utf8');
+        const topicsJson = JSON.parse(topicsData);
+        selectedTopic = topicsJson.primary_5_topics[topic] || topic;
+      } catch (error) {
+        console.warn('Failed to load topic mapping, using key as fallback:', error.message);
+        selectedTopic = topic;
+      }
+    }
 
     const genAI = new GoogleGenerativeAI(apiKey);
 

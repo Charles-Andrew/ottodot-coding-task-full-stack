@@ -12,6 +12,7 @@ interface ProblemGeneratorProps {
   selectedTopic: string;
   setSelectedTopic: (topic: string) => void;
   topics: string[];
+  topicMapping: Record<string, string>;
   generateProblem: () => void;
   isGenerating: boolean;
 }
@@ -24,6 +25,7 @@ export const ProblemGenerator = ({
   selectedTopic,
   setSelectedTopic,
   topics,
+  topicMapping,
   generateProblem,
   isGenerating,
 }: ProblemGeneratorProps) => {
@@ -81,9 +83,9 @@ export const ProblemGenerator = ({
           className="w-full p-3 rounded-xl bg-gray-800 text-white border border-gray-600 focus:border-indigo-500 focus:outline-none transition-colors"
         >
           <option value="random">Random</option>
-          {topics.map((topic) => (
-            <option key={topic} value={topic}>
-              {topic}
+          {topics.map((topicKey) => (
+            <option key={topicKey} value={topicKey}>
+              {topicMapping[topicKey] || topicKey}
             </option>
           ))}
         </select>
