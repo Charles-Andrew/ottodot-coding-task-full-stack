@@ -5,6 +5,7 @@ import { LoadingSpinner } from "@/components/ui/loading";
 interface SessionManagementProps {
   currentSessionId: string | null;
   isLoadingSession: boolean;
+  isInitialLoading: boolean;
   joinSessionId: string;
   setJoinSessionId: (id: string) => void;
   createNewSession: () => void;
@@ -16,6 +17,7 @@ interface SessionManagementProps {
 export const SessionManagement = ({
   currentSessionId,
   isLoadingSession,
+  isInitialLoading,
   joinSessionId,
   setJoinSessionId,
   createNewSession,
@@ -50,14 +52,14 @@ export const SessionManagement = ({
             </button>
           </div>
         </div>
-      ) : (
+      ) : !isInitialLoading ? (
         <div className="mb-6">
           <p className="text-white/70 mb-4">
             No active session. Create a new session or join an existing one
             to start tracking your progress.
           </p>
         </div>
-      )}
+      ) : null}
 
       {currentSessionId && (
         <div className="mb-4">

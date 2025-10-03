@@ -33,3 +33,17 @@ export const HistoryItemSkeleton = () => (
     </div>
   </div>
 );
+
+export const SessionSkeleton = () => (
+  <div className="bg-black/80 rounded-3xl p-6 md:p-8 mb-8 shadow-2xl backdrop-blur-xl border border-white/10 bg-gradient-to-br from-indigo-500/15 to-purple-600/15">
+    <div className="mb-6">
+      <SkeletonLoader className="w-32 h-6 mb-4" />
+      <SkeletonLoader className="w-full h-4 mb-2" />
+      <SkeletonLoader className="w-3/4 h-4" />
+    </div>
+    <div className="flex flex-col sm:flex-row gap-4">
+      <SkeletonLoader className="w-full h-12 rounded-xl" />
+      <SkeletonLoader className="w-full h-12 rounded-xl" />
+    </div>
+  </div>
+);

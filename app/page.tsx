@@ -16,7 +16,7 @@ import {
   CloseIcon,
   DocumentIcon,
 } from "@/components/icons";
-import { LoadingSpinner, SkeletonLoader, HistoryItemSkeleton } from "@/components/ui/loading";
+import { LoadingSpinner, SkeletonLoader, HistoryItemSkeleton, SessionSkeleton } from "@/components/ui/loading";
 import { HistoryModal } from "@/components/modals/HistoryModal";
 import { MigrationModal } from "@/components/modals/MigrationModal";
 import { FeedbackModal } from "@/components/modals/FeedbackModal";
@@ -68,6 +68,7 @@ export default function Home() {
     streak: number;
   } | null>(null);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [joinSessionId, setJoinSessionId] = useState("");
 
   // Feedback modal state
@@ -159,6 +160,7 @@ export default function Home() {
   // Load saved session from localStorage on mount
   useEffect(() => {
     const loadSession = async () => {
+      setIsInitialLoading(true);
       try {
         const savedSessionId = localStorage.getItem("current_session_id");
         if (savedSessionId) {
@@ -206,6 +208,7 @@ export default function Home() {
         localStorage.removeItem("current_session_id");
       } finally {
         setIsLoadingSession(false);
+        setIsInitialLoading(false);
       }
     };
 
@@ -514,16 +517,21 @@ export default function Home() {
           </p>
         </div>
 
-        <SessionManagement
-          currentSessionId={currentSessionId}
-          isLoadingSession={isLoadingSession}
-          joinSessionId={joinSessionId}
-          setJoinSessionId={setJoinSessionId}
-          createNewSession={createNewSession}
-          endSession={endSession}
-          joinSession={joinSession}
-          showToast={showToastNotification}
-        />
+        {isInitialLoading && !currentSessionId ? (
+          <SessionSkeleton />
+        ) : (
+          <SessionManagement
+            currentSessionId={currentSessionId}
+            isLoadingSession={isLoadingSession}
+            isInitialLoading={isInitialLoading}
+            joinSessionId={joinSessionId}
+            setJoinSessionId={setJoinSessionId}
+            createNewSession={createNewSession}
+            endSession={endSession}
+            joinSession={joinSession}
+            showToast={showToastNotification}
+          />
+        )}
 
         <SessionStats
           sessionData={sessionData}
