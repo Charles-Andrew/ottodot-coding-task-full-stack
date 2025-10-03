@@ -70,6 +70,7 @@ export default function Home() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isCreatingSession, setIsCreatingSession] = useState(false);
+  const [isJoiningSession, setIsJoiningSession] = useState(false);
   const [joinSessionId, setJoinSessionId] = useState("");
 
   // Feedback modal state
@@ -437,6 +438,7 @@ export default function Home() {
   const joinSession = async () => {
     if (!joinSessionId || joinSessionId.length !== 5) return;
 
+    setIsJoiningSession(true);
     setIsLoadingSession(true);
     try {
       const res = await fetch("/api/session/join", {
@@ -490,6 +492,7 @@ export default function Home() {
       }
     } finally {
       setIsLoadingSession(false);
+      setIsJoiningSession(false);
     }
   };
 
@@ -520,7 +523,7 @@ export default function Home() {
           </p>
         </div>
 
-        {isInitialLoading && !currentSessionId || isCreatingSession ? (
+        {isInitialLoading && !currentSessionId || isCreatingSession || isJoiningSession ? (
           <SessionSkeleton />
         ) : (
           <SessionManagement
