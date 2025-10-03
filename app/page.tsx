@@ -18,7 +18,7 @@ import {
 } from "@/components/icons";
 import { LoadingSpinner, SkeletonLoader, HistoryItemSkeleton, SessionSkeleton } from "@/components/ui/loading";
 import { HistoryModal } from "@/components/modals/HistoryModal";
-import { MigrationModal } from "@/components/modals/MigrationModal";
+
 import { FeedbackModal } from "@/components/modals/FeedbackModal";
 import { SessionManagement } from "@/components/sections/SessionManagement";
 import { SessionStats } from "@/components/sections/SessionStats";
@@ -84,13 +84,7 @@ export default function Home() {
   const [totalHistoryPages, setTotalHistoryPages] = useState(1);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  // Migration modal state
-  const [isMigrationModalOpen, setIsMigrationModalOpen] = useState(false);
-  const [legacyScores, setLegacyScores] = useState<{
-    correctCount: number;
-    totalCount: number;
-    streak: number;
-  } | null>(null);
+
 
   // Toast notification state
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -181,28 +175,6 @@ export default function Home() {
           } else {
             // Session not found or expired, clear localStorage
             localStorage.removeItem("current_session_id");
-          }
-        } else {
-          // Check for legacy scores to offer migration
-          const legacy = localStorage.getItem("math_scores");
-          if (legacy) {
-            try {
-              const data = JSON.parse(legacy);
-              const isExpired =
-                Date.now() - data.timestamp > 24 * 60 * 60 * 1000; // 24 hours
-              if (!isExpired && data.correctCount > 0) {
-                setLegacyScores({
-                  correctCount: data.correctCount,
-                  totalCount: data.totalCount,
-                  streak: data.streak,
-                });
-                setIsMigrationModalOpen(true);
-              } else {
-                localStorage.removeItem("math_scores");
-              }
-            } catch (error) {
-              localStorage.removeItem("math_scores");
-            }
           }
         }
       } catch (error) {
@@ -400,40 +372,7 @@ export default function Home() {
     localStorage.removeItem("current_math_problem");
   };
 
-  const migrateLegacyScores = async () => {
-    if (!legacyScores) return;
 
-    setIsLoadingSession(true);
-    try {
-      // Create new session
-      const res = await fetch("/api/session/create", { method: "POST" });
-      if (!res.ok) throw new Error("Failed to create session");
-      const data = await res.json();
-
-      // Update the session with legacy scores (this would require a new API endpoint)
-      // For now, we'll just create a new session and note that scores will build up
-      // In a real implementation, you'd want an API to set initial scores
-
-      setCurrentSessionId(data.session_id);
-      setSessionData({ correct_count: 0, total_count: 0, streak: 0 }); // Start fresh
-      localStorage.setItem("current_session_id", data.session_id);
-
-      // Clear legacy data
-      localStorage.removeItem("math_scores");
-      setLegacyScores(null);
-      setIsMigrationModalOpen(false);
-    } catch (error) {
-      console.error("Failed to migrate scores:", error);
-    } finally {
-      setIsLoadingSession(false);
-    }
-  };
-
-  const skipMigration = () => {
-    localStorage.removeItem("math_scores");
-    setLegacyScores(null);
-    setIsMigrationModalOpen(false);
-  };
 
   const joinSession = async () => {
     if (!joinSessionId || joinSessionId.length !== 5) return;
@@ -584,13 +523,7 @@ export default function Home() {
           onFetchHistory={fetchHistory}
         />
 
-        <MigrationModal
-          isOpen={isMigrationModalOpen}
-          legacyScores={legacyScores}
-          isLoadingSession={isLoadingSession}
-          onMigrate={migrateLegacyScores}
-          onSkip={skipMigration}
-        />
+
 
         <FeedbackModal
           isOpen={isFeedbackModalOpen}
