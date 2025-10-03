@@ -1,5 +1,6 @@
 import { CheckIcon, XIcon, CloseIcon, ClockIcon } from "@/components/icons";
 import { HistoryItemSkeleton, LoadingSpinner } from "@/components/ui/loading";
+import { SafeHtmlWithMath } from "@/components/ui/SafeHtmlWithMath";
 
 interface HistorySubmission {
   id: string;
@@ -162,40 +163,45 @@ export const HistoryModal = ({
                       )}
                     </div>
 
-                    <details className="mt-3">
-                      <summary className="text-blue-400 cursor-pointer hover:text-blue-300 text-sm">
-                        Show feedback
-                      </summary>
-                      <div className="mt-2 p-3 bg-black/30 rounded text-sm text-white/90">
-                        {submission.feedback_text}
-                      </div>
-                    </details>
+                     <details className="mt-3">
+                       <summary className="text-blue-400 cursor-pointer hover:text-blue-300 text-sm">
+                         Show feedback
+                       </summary>
+                       <div className="mt-2 p-3 bg-black/30 rounded text-sm">
+                         <SafeHtmlWithMath
+                           html={submission.feedback_text}
+                           className="text-white/90 leading-relaxed prose prose-invert max-w-none"
+                         />
+                       </div>
+                     </details>
                   </div>
                 ))}
               </div>
 
-              {/* Pagination */}
-              {totalHistoryPages > 1 && (
-                <div className="flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => onFetchHistory(currentHistoryPage - 1)}
-                    disabled={currentHistoryPage === 1}
-                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
-                  >
-                    Previous
-                  </button>
-                  <span className="text-white/70">
-                    Page {currentHistoryPage} of {totalHistoryPages}
-                  </span>
-                  <button
-                    onClick={() => onFetchHistory(currentHistoryPage + 1)}
-                    disabled={currentHistoryPage === totalHistoryPages}
-                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
+               {/* Pagination */}
+               {totalHistoryPages > 1 && (
+                 <div className="flex items-center justify-center gap-2">
+                   <button
+                     onClick={() => onFetchHistory(currentHistoryPage - 1)}
+                     disabled={currentHistoryPage === 1}
+                     className="w-10 h-10 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center text-xl"
+                     title="Previous page"
+                   >
+                     ‹
+                   </button>
+                   <span className="text-white/70">
+                     Page {currentHistoryPage} of {totalHistoryPages}
+                   </span>
+                   <button
+                     onClick={() => onFetchHistory(currentHistoryPage + 1)}
+                     disabled={currentHistoryPage === totalHistoryPages}
+                     className="w-10 h-10 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center text-xl"
+                     title="Next page"
+                   >
+                     ›
+                   </button>
+                 </div>
+               )}
             </>
           )}
         </div>
