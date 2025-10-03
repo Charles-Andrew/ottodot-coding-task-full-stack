@@ -15,6 +15,7 @@ interface ProblemDisplayProps {
   setUserAnswer: (answer: string) => void;
   submitAnswer: (e: React.FormEvent) => void;
   isSubmitting: boolean;
+  isGenerating: boolean;
   hint: string | null;
   showHint: boolean;
   isLoadingHint: boolean;
@@ -31,13 +32,14 @@ export const ProblemDisplay = ({
   setUserAnswer,
   submitAnswer,
   isSubmitting,
+  isGenerating,
   hint,
   showHint,
   isLoadingHint,
   getHint,
   hintCredits,
 }: ProblemDisplayProps) => {
-  if (!problem) return null;
+  if (!problem || isGenerating) return null;
 
   return (
     <div className="bg-gradient-radial from-black/90 via-gray-900/80 to-black/90 rounded-3xl p-6 md:p-8 mb-8 shadow-2xl backdrop-blur-xl border border-white/10">
