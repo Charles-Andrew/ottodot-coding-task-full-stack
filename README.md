@@ -105,13 +105,13 @@ Create a new API route that handles:
 
 ### 3. Requirements Checklist
 
-- [ ] AI generates appropriate Primary 5 level math problems
-- [ ] Problems and answers are saved to Supabase
-- [ ] User submissions are saved with feedback
-- [ ] AI generates helpful, personalized feedback
-- [ ] UI is clean and mobile-responsive
-- [ ] Error handling for API failures
-- [ ] Loading states during API calls
+- [x] AI generates appropriate Primary 5 level math problems
+- [x] Problems and answers are saved to Supabase
+- [x] User submissions are saved with feedback
+- [x] AI generates helpful, personalized feedback
+- [x] UI is clean and mobile-responsive
+- [x] Error handling for API failures
+- [x] Loading states during API calls
 
 ## Deployment
 
@@ -130,8 +130,8 @@ When submitting your assessment, provide:
 2. **Live Demo URL**: Your Vercel deployment
 3. **Supabase Credentials**: Add these to your README for testing:
    ```
-   SUPABASE_URL: [Your Supabase Project URL]
-   SUPABASE_ANON_KEY: [Your Supabase Anon Key]
+   SUPABASE_URL: https://mphkgjypewlqxfikszgh.supabase.co
+   SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1waGtnanlwZXdscXhmaWtzemdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0NDU1NjAsImV4cCI6MjA3NTAyMTU2MH0.iMQ9X5JvOfTNsCK1MUaH3CYcjy8JeiC66BLpo0u_JMI
    ```
 
 ## Implementation Notes
@@ -140,20 +140,24 @@ When submitting your assessment, provide:
 
 ### My Implementation:
 
-- 
-- 
-- 
+- Implemented user session management allowing users to copy session codes and resume quizzes on different devices or at a later time
+- Added HTML rendering for step-by-step solution explanations in feedback instead of plain text
+- Developed custom topics tailored for Primary 5 students based on the Singapore Math Syllabus
+- Created dynamic question descriptions including topic, difficulty level, and problem type
+- Built a hint system with a reward mechanism for solving problems without hints, capped at 5 hints per session
+- Designed a responsive, clean UI with loading states and skeleton screens
+- Overcame the challenge of crafting effective dynamic prompts for reliable AI-generated math problems
 
 ## Additional Features (Optional)
 
 If you have time, consider adding:
 
-- [ ] Difficulty levels (Easy/Medium/Hard)
-- [ ] Problem history view
-- [ ] Score tracking
-- [ ] Different problem types (addition, subtraction, multiplication, division)
-- [ ] Hints system
-- [ ] Step-by-step solution explanations
+- [x] Difficulty levels (Easy/Medium/Hard)
+- [x] Problem history view
+- [x] Score tracking
+- [x] Different problem types (addition, subtraction, multiplication, division)
+- [x] Hints system
+- [x] Step-by-step solution explanations
 
 ---
 
