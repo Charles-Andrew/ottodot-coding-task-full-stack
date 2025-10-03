@@ -1,3 +1,5 @@
+import { DocumentIcon } from "@/components/icons";
+
 interface SessionData {
   correct_count: number;
   total_count: number;
@@ -8,10 +10,12 @@ interface SessionData {
 
 interface SessionStatsProps {
   sessionData: SessionData | null;
+  onOpenHistory?: () => void;
 }
 
 export const SessionStats = ({
   sessionData,
+  onOpenHistory,
 }: SessionStatsProps) => {
   if (!sessionData || sessionData.total_count === 0) return null;
 
@@ -40,6 +44,15 @@ export const SessionStats = ({
             }}
           ></div>
         </div>
+        {onOpenHistory && (
+          <button
+            onClick={onOpenHistory}
+            className="mt-4 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl mx-auto"
+          >
+            <DocumentIcon />
+            View History
+          </button>
+        )}
       </div>
     </div>
   );

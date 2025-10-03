@@ -557,7 +557,7 @@ export default function Home() {
           />
         )}
 
-        <SessionStats sessionData={sessionData} />
+        <SessionStats sessionData={sessionData} onOpenHistory={openHistoryModal} />
 
         {currentSessionId &&
           !(
