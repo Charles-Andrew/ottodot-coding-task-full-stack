@@ -71,7 +71,7 @@ export default function Home() {
   const [selectedProblemType, setSelectedProblemType] = useState<
     "random" | "addition" | "subtraction" | "multiplication" | "division"
   >("random");
-  const [selectedTopic, setSelectedTopic] = useState<string>("");
+  const [selectedTopic, setSelectedTopic] = useState<string>("random");
   const [topics, setTopics] = useState<string[]>([]);
   const [topicMapping, setTopicMapping] = useState<Record<string, string>>({});
 
@@ -250,16 +250,7 @@ export default function Home() {
     loadTopics();
   }, []);
 
-  // Set default topic on initial load only
-  useEffect(() => {
-    if (topics.length > 0 && selectedTopic === "") {
-      // Only set default topic if none is selected yet (initial load)
-      const filteredTopics = getFilteredTopics(topics, selectedProblemType);
-      if (filteredTopics.length > 0) {
-        setSelectedTopic(filteredTopics[0]);
-      }
-    }
-  }, [topics, selectedProblemType, selectedTopic, getFilteredTopics, topicMapping]);
+
 
   // Function to get random problem type
   const getRandomProblemType = (): "addition" | "subtraction" | "multiplication" | "division" => {
@@ -672,6 +663,7 @@ export default function Home() {
             setUserAnswer={setUserAnswer}
             submitAnswer={submitAnswer}
             isSubmitting={isSubmitting}
+            isGenerating={isGenerating}
             hint={hint}
             showHint={showHint}
             isLoadingHint={isLoadingHint}
