@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     // Fetch session data
     const { data: session, error: sessionError } = await supabase
       .from('user_sessions')
-      .select('correct_count, total_count, streak, created_at, last_accessed_at')
+      .select('correct_count, total_count, streak, hint_credits, hint_cap, created_at, last_accessed_at')
       .eq('id', sessionId)
       .single();
 

@@ -1,4 +1,4 @@
-import { DocumentIcon, SendIcon } from "@/components/icons";
+import { DocumentIcon, SendIcon, SparklesIcon } from "@/components/icons";
 import { LoadingSpinner } from "@/components/ui/loading";
 
 interface MathProblem {
@@ -14,6 +14,11 @@ interface ProblemDisplayProps {
   setUserAnswer: (answer: string) => void;
   submitAnswer: (e: React.FormEvent) => void;
   isSubmitting: boolean;
+  hint: string | null;
+  showHint: boolean;
+  isLoadingHint: boolean;
+  getHint: () => void;
+  hintCredits: number;
 }
 
 export const ProblemDisplay = ({
@@ -24,6 +29,11 @@ export const ProblemDisplay = ({
   setUserAnswer,
   submitAnswer,
   isSubmitting,
+  hint,
+  showHint,
+  isLoadingHint,
+  getHint,
+  hintCredits,
 }: ProblemDisplayProps) => {
   if (!problem) return null;
 
@@ -51,6 +61,32 @@ export const ProblemDisplay = ({
       </div>
       <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl text-lg leading-relaxed mb-8 border-l-4 border-indigo-500 text-white">
         {problem.problem_text}
+      </div>
+
+      {/* Hint Section */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-white/70">Hint Credits: {hintCredits}</span>
+          <button
+            type="button"
+            onClick={getHint}
+            disabled={isLoadingHint || hintCredits <= 0}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-purple-500 to-purple-700 text-white rounded-lg hover:from-purple-600 hover:to-purple-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            {isLoadingHint && <LoadingSpinner />}
+            <SparklesIcon />
+            <span>{isLoadingHint ? "Getting Hint..." : "Get Hint"}</span>
+          </button>
+        </div>
+        {showHint && hint && (
+          <div className="bg-gradient-to-br from-purple-900/50 to-indigo-900/50 p-4 rounded-lg border border-purple-500/30">
+            <div className="flex items-center gap-2 mb-2">
+              <SparklesIcon />
+              <span className="font-semibold text-purple-300">Hint</span>
+            </div>
+            <p className="text-white/90">{hint}</p>
+          </div>
+        )}
       </div>
 
       <form onSubmit={submitAnswer}>

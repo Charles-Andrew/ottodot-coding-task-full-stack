@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     // Fetch the problem session
     const { data: session, error: sessionError } = await supabase
       .from('math_problem_sessions')
-      .select('problem_text, correct_answer')
+      .select('problem_text, correct_answer, hints_used')
       .eq('id', session_id)
       .single();
 
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     // Validate user session exists
     const { data: userSession, error: userSessionError } = await supabase
       .from('user_sessions')
-      .select('correct_count, total_count, streak')
+      .select('correct_count, total_count, streak, hint_credits, hint_cap')
       .eq('id', user_session_id)
       .single();
 
@@ -42,12 +42,19 @@ export async function POST(request: NextRequest) {
     const newCorrectCount = isCorrect ? userSession.correct_count + 1 : userSession.correct_count;
     const newStreak = isCorrect ? userSession.streak + 1 : 0;
 
+    // Update hint credits: +1 if correct and no hints used, cap at hint_cap
+    let newHintCredits = userSession.hint_credits;
+    if (isCorrect && session.hints_used === 0) {
+      newHintCredits = Math.min(userSession.hint_credits + 1, userSession.hint_cap);
+    }
+
     const { error: updateError } = await supabase
       .from('user_sessions')
       .update({
         total_count: newTotalCount,
         correct_count: newCorrectCount,
-        streak: newStreak
+        streak: newStreak,
+        hint_credits: newHintCredits
       })
       .eq('id', user_session_id);
 
