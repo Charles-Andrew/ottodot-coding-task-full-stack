@@ -43,7 +43,8 @@ export async function GET(request: NextRequest) {
           problem_text,
           correct_answer,
           difficulty,
-          topic
+          topic,
+          problem_type
         )
       `)
       .eq('user_session_id', userSessionId)

@@ -8,13 +8,14 @@ interface HistorySubmission {
   is_correct: boolean;
   feedback_text: string;
   created_at: string;
-  math_problem_sessions: {
-    id: string;
-    problem_text: string;
-    correct_answer: number;
-    difficulty: string;
-    topic: string;
-  };
+   math_problem_sessions: {
+     id: string;
+     problem_text: string;
+     correct_answer: number;
+     difficulty: string;
+     topic: string;
+     problem_type: string;
+   };
 }
 
 interface HistoryModalProps {
@@ -106,26 +107,31 @@ export const HistoryModal = ({
                             ).toLocaleTimeString()}
                           </span>
                         </div>
-                        <div className="flex gap-2 mb-2">
-                          {submission.math_problem_sessions.topic && (
-                            <span className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded text-xs">
-                              {topicMapping[submission.math_problem_sessions.topic] || submission.math_problem_sessions.topic}
-                            </span>
-                          )}
-                          <span
-                            className={`px-2 py-1 rounded text-xs ${
-                              submission.math_problem_sessions
-                                .difficulty === "easy"
-                                ? "bg-green-600/20 text-green-300"
-                                : submission.math_problem_sessions
-                                    .difficulty === "medium"
-                                ? "bg-yellow-600/20 text-yellow-300"
-                                : "bg-red-600/20 text-red-300"
-                            }`}
-                          >
-                            {submission.math_problem_sessions.difficulty}
-                          </span>
-                        </div>
+                         <div className="flex flex-col sm:flex-row gap-2 mb-2">
+                           {submission.math_problem_sessions.topic && (
+                             <span className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded text-xs">
+                               {topicMapping[submission.math_problem_sessions.topic] || submission.math_problem_sessions.topic}
+                             </span>
+                           )}
+                           {submission.math_problem_sessions.problem_type && (
+                             <span className="px-2 py-1 bg-purple-600/20 text-purple-300 rounded text-xs">
+                               {submission.math_problem_sessions.problem_type.charAt(0).toUpperCase() + submission.math_problem_sessions.problem_type.slice(1)}
+                             </span>
+                           )}
+                           <span
+                             className={`px-2 py-1 rounded text-xs ${
+                               submission.math_problem_sessions
+                                 .difficulty === "easy"
+                                 ? "bg-green-600/20 text-green-300"
+                                 : submission.math_problem_sessions
+                                     .difficulty === "medium"
+                                 ? "bg-yellow-600/20 text-yellow-300"
+                                 : "bg-red-600/20 text-red-300"
+                             }`}
+                           >
+                             {submission.math_problem_sessions.difficulty.charAt(0).toUpperCase() + submission.math_problem_sessions.difficulty.slice(1)}
+                           </span>
+                         </div>
                       </div>
                     </div>
 
