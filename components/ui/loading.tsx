@@ -1,5 +1,5 @@
 export const LoadingSpinner = ({ className = "" }: { className?: string }) => (
-  <div className={`inline-block w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin ${className}`} />
+  <div className={`inline-block w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin ${className}`} />
 );
 
 export const SkeletonLoader = ({ className }: { className: string }) => (

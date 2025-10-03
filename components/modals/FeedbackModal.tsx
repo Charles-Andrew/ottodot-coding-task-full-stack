@@ -1,5 +1,6 @@
 import { MathIcon } from "@/components/icons";
 import { SafeHtmlWithMath } from "@/components/ui/SafeHtmlWithMath";
+import { LoadingSpinner } from "@/components/ui/loading";
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -36,7 +37,7 @@ export const FeedbackModal = ({
               <h2 className="text-2xl font-bold text-white mb-4">
                 Analyzing Your Answer
               </h2>
-              <p className="text-white/70">Getting personalized feedback...</p>
+              <LoadingSpinner className="w-12 h-12 mx-auto" />
             </div>
           ) : (
             <div className="text-center">

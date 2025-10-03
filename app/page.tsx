@@ -554,14 +554,7 @@ export default function Home() {
       });
       localStorage.setItem("current_session_id", joinSessionId);
 
-      // Auto-copy session ID to clipboard
-      try {
-        await navigator.clipboard.writeText(joinSessionId);
-        showToastNotification("Joined session! ID copied to clipboard.");
-      } catch (clipboardError) {
-        console.warn("Failed to copy session ID to clipboard:", clipboardError);
-        showToastNotification("Successfully joined session!");
-      }
+      showToastNotification("Successfully joined session!");
 
       setJoinSessionId("");
 

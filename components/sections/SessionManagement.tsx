@@ -87,7 +87,7 @@ export const SessionManagement = ({
             New Session
           </button>
 
-          <div className="flex-1 flex gap-2">
+          <div className="flex-1 flex flex-col gap-2 sm:flex-row">
             <input
               type="text"
               placeholder="Enter session ID (e.g., ABC12)"

@@ -38,7 +38,8 @@ export const ProblemGenerator = ({
         <select
           value={selectedProblemType}
           onChange={(e) => setSelectedProblemType(e.target.value as ProblemType)}
-          className="w-full p-3 rounded-xl bg-gray-800 text-white border border-gray-600 focus:border-indigo-500 focus:outline-none transition-colors"
+          disabled={isGenerating}
+          className="w-full p-3 rounded-xl bg-gray-800 text-white border border-gray-600 focus:border-indigo-500 focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value="random">Random</option>
           <option value="addition">Addition</option>
@@ -57,7 +58,8 @@ export const ProblemGenerator = ({
             <button
               key={level}
               onClick={() => setSelectedDifficulty(level)}
-              className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
+              disabled={isGenerating}
+              className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
                 selectedDifficulty === level
                   ? level === "easy"
                     ? "bg-green-600 text-white shadow-lg"
@@ -80,7 +82,8 @@ export const ProblemGenerator = ({
         <select
           value={selectedTopic}
           onChange={(e) => setSelectedTopic(e.target.value)}
-          className="w-full p-3 rounded-xl bg-gray-800 text-white border border-gray-600 focus:border-indigo-500 focus:outline-none transition-colors"
+          disabled={isGenerating}
+          className="w-full p-3 rounded-xl bg-gray-800 text-white border border-gray-600 focus:border-indigo-500 focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value="random">Random</option>
           {topics.map((topicKey) => (
@@ -96,11 +99,14 @@ export const ProblemGenerator = ({
         disabled={isGenerating}
         className="w-full font-semibold text-lg p-4 rounded-xl cursor-pointer transition-all duration-300 flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:-translate-y-1 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 bg-gradient-to-br from-indigo-500 to-purple-600 text-white"
       >
-        {isGenerating && <LoadingSpinner />}
-        <SparklesIcon />
-        <span>
-          {isGenerating ? "Generating Problem..." : "Generate New Problem"}
-        </span>
+        {isGenerating ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <SparklesIcon />
+            <span>Generate New Problem</span>
+          </>
+        )}
       </button>
     </div>
   );
