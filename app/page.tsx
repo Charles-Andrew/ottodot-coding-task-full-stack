@@ -69,6 +69,7 @@ export default function Home() {
   } | null>(null);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
   const [joinSessionId, setJoinSessionId] = useState("");
 
   // Feedback modal state
@@ -343,6 +344,7 @@ export default function Home() {
   };
 
   const createNewSession = async () => {
+    setIsCreatingSession(true);
     setIsLoadingSession(true);
     try {
       const res = await fetch("/api/session/create", { method: "POST" });
@@ -375,6 +377,7 @@ export default function Home() {
       showToastNotification("Failed to create session. Please try again.");
     } finally {
       setIsLoadingSession(false);
+      setIsCreatingSession(false);
     }
   };
 
@@ -517,7 +520,7 @@ export default function Home() {
           </p>
         </div>
 
-        {isInitialLoading && !currentSessionId ? (
+        {isInitialLoading && !currentSessionId || isCreatingSession ? (
           <SessionSkeleton />
         ) : (
           <SessionManagement
