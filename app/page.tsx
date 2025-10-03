@@ -170,13 +170,8 @@ export default function Home() {
               setTopic(problemData.topic || "");
               setCurrentProblemDifficulty(problemData.difficulty || "N/A");
               setCurrentProblemType(problemData.problem_type || "");
-              // Restore filter selections from localStorage
-              if (data.problem_type) {
-                setSelectedProblemType(data.problem_type);
-              }
-              if (data.topic) {
-                setSelectedTopic(data.topic);
-              }
+              // Note: Filter selections (problem type, topic, difficulty) are not restored from localStorage
+              // They should reset to defaults on each page load for a fresh start
             } else {
               // Problem not found or expired, clear localStorage
               localStorage.removeItem("current_math_problem");
