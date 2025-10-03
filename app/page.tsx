@@ -438,6 +438,13 @@ export default function Home() {
   const joinSession = async () => {
     if (!joinSessionId || joinSessionId.length !== 5) return;
 
+    // Check if trying to join the current active session
+    if (currentSessionId === joinSessionId) {
+      showToastNotification("This is already your current active session.");
+      setJoinSessionId("");
+      return;
+    }
+
     setIsJoiningSession(true);
     setIsLoadingSession(true);
     try {
