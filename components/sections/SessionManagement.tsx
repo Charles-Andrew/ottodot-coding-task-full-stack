@@ -11,7 +11,7 @@ interface SessionManagementProps {
   createNewSession: () => void;
   endSession: () => void;
   joinSession: () => void;
-  showToast: (message: string) => void;
+  showToast: (message: string, type?: 'success' | 'error') => void;
 }
 
 export const SessionManagement = ({
@@ -42,7 +42,7 @@ export const SessionManagement = ({
                   showToast("Session ID copied to clipboard!");
                 } catch (error) {
                   console.warn("Failed to copy session ID:", error);
-                  showToast("Failed to copy session ID.");
+                  showToast("Failed to copy session ID.", 'error');
                 }
               }}
               className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"

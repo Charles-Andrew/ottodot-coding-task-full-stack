@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import {
-  MathIcon,
   CheckIcon,
   XIcon,
   CopyIcon,
@@ -16,7 +15,13 @@ import {
   CloseIcon,
   DocumentIcon,
 } from "@/components/icons";
-import { LoadingSpinner, SkeletonLoader, HistoryItemSkeleton, SessionSkeleton } from "@/components/ui/loading";
+import {
+  LoadingSpinner,
+  SkeletonLoader,
+  HistoryItemSkeleton,
+  SessionSkeleton,
+} from "@/components/ui/loading";
+import { Toast } from "@/components/ui/toast";
 import { HistoryModal } from "@/components/modals/HistoryModal";
 
 import { FeedbackModal } from "@/components/modals/FeedbackModal";
@@ -24,6 +29,7 @@ import { SessionManagement } from "@/components/sections/SessionManagement";
 import { SessionStats } from "@/components/sections/SessionStats";
 import { ProblemGenerator } from "@/components/sections/ProblemGenerator";
 import { ProblemDisplay } from "@/components/sections/ProblemDisplay";
+import { Header } from "@/components/sections/Header";
 
 interface MathProblem {
   problem_text: string;
@@ -66,6 +72,8 @@ export default function Home() {
     correct_count: number;
     total_count: number;
     streak: number;
+    hint_credits: number;
+    hint_cap: number;
   } | null>(null);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -84,15 +92,23 @@ export default function Home() {
   const [totalHistoryPages, setTotalHistoryPages] = useState(1);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-
+  // Hint state
+  const [hint, setHint] = useState<string | null>(null);
+  const [isLoadingHint, setIsLoadingHint] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   // Toast notification state
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<"success" | "error">("success");
   const [showToast, setShowToast] = useState(false);
 
   // Toast function
-  const showToastNotification = (message: string) => {
+  const showToastNotification = (
+    message: string,
+    type: "success" | "error" = "success"
+  ) => {
     setToastMessage(message);
+    setToastType(type);
     setShowToast(true);
     setTimeout(() => {
       setShowToast(false);
@@ -171,6 +187,8 @@ export default function Home() {
               correct_count: data.session.correct_count,
               total_count: data.session.total_count,
               streak: data.session.streak,
+              hint_credits: data.session.hint_credits,
+              hint_cap: data.session.hint_cap,
             });
           } else {
             // Session not found or expired, clear localStorage
@@ -243,6 +261,8 @@ export default function Home() {
     // Clear the problem display
     setProblem(null);
     setTopic("");
+    setHint(null);
+    setShowHint(false);
 
     try {
       const res = await fetch("/api/math-problem/submit", {
@@ -272,6 +292,8 @@ export default function Home() {
               correct_count: sessionDataResponse.session.correct_count,
               total_count: sessionDataResponse.session.total_count,
               streak: sessionDataResponse.session.streak,
+              hint_credits: sessionDataResponse.session.hint_credits,
+              hint_cap: sessionDataResponse.session.hint_cap,
             });
           }
         } catch (error) {
@@ -293,6 +315,48 @@ export default function Home() {
       setFeedbackModalLoading(false);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const getHint = async () => {
+    if (!sessionId || !currentSessionId) return;
+    setIsLoadingHint(true);
+    try {
+      const res = await fetch("/api/math-problem/hint", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          problem_session_id: sessionId,
+          user_session_id: currentSessionId,
+        }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to get hint");
+      }
+      const data = await res.json();
+      setHint(data.hint);
+      setShowHint(true);
+
+      // Refresh session data to update hint credits
+      const sessionRes = await fetch(
+        `/api/session/data?session_id=${currentSessionId}`
+      );
+      if (sessionRes.ok) {
+        const sessionDataResponse = await sessionRes.json();
+        setSessionData({
+          correct_count: sessionDataResponse.session.correct_count,
+          total_count: sessionDataResponse.session.total_count,
+          streak: sessionDataResponse.session.streak,
+          hint_credits: sessionDataResponse.session.hint_credits,
+          hint_cap: sessionDataResponse.session.hint_cap,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      showToastNotification(error.message || "Failed to get hint", "error");
+    } finally {
+      setIsLoadingHint(false);
     }
   };
 
@@ -325,7 +389,13 @@ export default function Home() {
       const data = await res.json();
 
       setCurrentSessionId(data.session_id);
-      setSessionData({ correct_count: 0, total_count: 0, streak: 0 });
+      setSessionData({
+        correct_count: 0,
+        total_count: 0,
+        streak: 0,
+        hint_credits: 3,
+        hint_cap: 5,
+      });
       localStorage.setItem("current_session_id", data.session_id);
 
       // Auto-copy session ID to clipboard
@@ -347,7 +417,10 @@ export default function Home() {
       localStorage.removeItem("current_math_problem");
     } catch (error) {
       console.error("Failed to create session:", error);
-      showToastNotification("Failed to create session. Please try again.");
+      showToastNotification(
+        "Failed to create session. Please try again.",
+        "error"
+      );
     } finally {
       setIsLoadingSession(false);
       setIsCreatingSession(false);
@@ -368,11 +441,11 @@ export default function Home() {
     setTopic("");
     setFeedback("");
     setIsCorrect(null);
+    setHint(null);
+    setShowHint(false);
     setUserAnswer("");
     localStorage.removeItem("current_math_problem");
   };
-
-
 
   const joinSession = async () => {
     if (!joinSessionId || joinSessionId.length !== 5) return;
@@ -407,6 +480,8 @@ export default function Home() {
         correct_count: data.correct_count,
         total_count: data.total_count,
         streak: data.streak,
+        hint_credits: data.hint_credits,
+        hint_cap: data.hint_cap,
       });
       localStorage.setItem("current_session_id", joinSessionId);
 
@@ -432,9 +507,15 @@ export default function Home() {
     } catch (error) {
       console.error("Failed to join session:", error);
       if (error.message === "Session not found") {
-        showToastNotification("Session not found. Please check the ID and try again.");
+        showToastNotification(
+          "Session not found. Please check the ID and try again.",
+          "error"
+        );
       } else {
-        showToastNotification("Failed to join session. Please try again.");
+        showToastNotification(
+          "Failed to join session. Please try again.",
+          "error"
+        );
       }
     } finally {
       setIsLoadingSession(false);
@@ -456,20 +537,11 @@ export default function Home() {
   return (
     <>
       <div className="min-h-screen p-4 md:p-8 max-w-3xl mx-auto bg-gradient-radial from-indigo-900/20 via-purple-900/20 to-black bg-black">
-        <div className="flex flex-col items-center justify-center mb-12">
-          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 shadow-2xl">
-            <MathIcon />
-          </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4 drop-shadow-lg text-center">
-            Math Problem Generator
-          </h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed text-center mb-6">
-            Challenge yourself with AI-generated math problems designed for
-            Primary 5 students
-          </p>
-        </div>
+        <Header />
 
-        {isInitialLoading && !currentSessionId || isCreatingSession || isJoiningSession ? (
+        {(isInitialLoading && !currentSessionId) ||
+        isCreatingSession ||
+        isJoiningSession ? (
           <SessionSkeleton />
         ) : (
           <SessionManagement
@@ -485,23 +557,27 @@ export default function Home() {
           />
         )}
 
-        <SessionStats
-          sessionData={sessionData}
-          currentSessionId={currentSessionId}
-          createNewSession={createNewSession}
-          isLoadingSession={isLoadingSession}
-        />
+        <SessionStats sessionData={sessionData} />
 
-        {currentSessionId && !(isInitialLoading && !currentSessionId || isCreatingSession || isJoiningSession) && (
-          <ProblemGenerator
-            selectedDifficulty={selectedDifficulty}
-            setSelectedDifficulty={setSelectedDifficulty}
-            generateProblem={generateProblem}
-            isGenerating={isGenerating}
-          />
-        )}
+        {currentSessionId &&
+          !(
+            (isInitialLoading && !currentSessionId) ||
+            isCreatingSession ||
+            isJoiningSession
+          ) && (
+            <ProblemGenerator
+              selectedDifficulty={selectedDifficulty}
+              setSelectedDifficulty={setSelectedDifficulty}
+              generateProblem={generateProblem}
+              isGenerating={isGenerating}
+            />
+          )}
 
-        {!(isInitialLoading && !currentSessionId || isCreatingSession || isJoiningSession) && (
+        {!(
+          (isInitialLoading && !currentSessionId) ||
+          isCreatingSession ||
+          isJoiningSession
+        ) && (
           <ProblemDisplay
             problem={problem}
             topic={topic}
@@ -510,6 +586,11 @@ export default function Home() {
             setUserAnswer={setUserAnswer}
             submitAnswer={submitAnswer}
             isSubmitting={isSubmitting}
+            hint={hint}
+            showHint={showHint}
+            isLoadingHint={isLoadingHint}
+            getHint={getHint}
+            hintCredits={sessionData?.hint_credits || 0}
           />
         )}
 
@@ -523,8 +604,6 @@ export default function Home() {
           onFetchHistory={fetchHistory}
         />
 
-
-
         <FeedbackModal
           isOpen={isFeedbackModalOpen}
           onClose={() => setIsFeedbackModalOpen(false)}
@@ -534,14 +613,7 @@ export default function Home() {
         />
 
         {/* Toast Notification */}
-        {showToast && toastMessage && (
-          <div className="fixed top-4 right-4 z-50 animate-fade-in">
-            <div className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2">
-              <CheckIcon />
-              <span>{toastMessage}</span>
-            </div>
-          </div>
-        )}
+        <Toast message={toastMessage || ""} type={toastType} show={showToast} />
       </div>
     </>
   );
