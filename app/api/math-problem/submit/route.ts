@@ -4,8 +4,8 @@ import { supabase } from '@/lib/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    const { session_id, user_answer } = await request.json();
-    if (!session_id || typeof user_answer !== 'number') {
+    const { session_id, user_session_id, user_answer } = await request.json();
+    if (!session_id || !user_session_id || typeof user_session_id !== 'string' || user_session_id.length !== 5 || typeof user_answer !== 'number') {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
@@ -25,6 +25,36 @@ export async function POST(request: NextRequest) {
     }
 
     const isCorrect = Math.abs(user_answer - session.correct_answer) < 0.001; // Handle floating point
+
+    // Validate user session exists
+    const { data: userSession, error: userSessionError } = await supabase
+      .from('user_sessions')
+      .select('correct_count, total_count, streak')
+      .eq('id', user_session_id)
+      .single();
+
+    if (userSessionError || !userSession) {
+      return NextResponse.json({ error: 'User session not found' }, { status: 404 });
+    }
+
+    // Update user session scores
+    const newTotalCount = userSession.total_count + 1;
+    const newCorrectCount = isCorrect ? userSession.correct_count + 1 : userSession.correct_count;
+    const newStreak = isCorrect ? userSession.streak + 1 : 0;
+
+    const { error: updateError } = await supabase
+      .from('user_sessions')
+      .update({
+        total_count: newTotalCount,
+        correct_count: newCorrectCount,
+        streak: newStreak
+      })
+      .eq('id', user_session_id);
+
+    if (updateError) {
+      console.error('Session update error:', updateError);
+      throw new Error('Failed to update session scores');
+    }
 
     // Generate AI feedback
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -52,6 +82,7 @@ Keep your response concise, friendly, and age-appropriate for Primary 5 students
       .from('math_problem_submissions')
       .insert({
         session_id,
+        user_session_id,
         user_answer,
         is_correct: isCorrect,
         feedback_text: feedback
