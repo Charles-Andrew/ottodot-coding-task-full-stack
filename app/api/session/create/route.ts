@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 
 function generateSessionId(): string {
@@ -10,7 +10,7 @@ function generateSessionId(): string {
   return result;
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     let sessionId: string;
     let attempts = 0;
@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
       if (attempts >= maxAttempts) {
         throw new Error('Failed to generate unique session ID after maximum attempts');
       }
+    // eslint-disable-next-line no-constant-condition
     } while (true);
 
     // Insert new session
