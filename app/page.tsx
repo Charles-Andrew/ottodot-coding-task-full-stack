@@ -24,13 +24,14 @@ interface HistorySubmission {
   is_correct: boolean;
   feedback_text: string;
   created_at: string;
-  math_problem_sessions: {
-    id: string;
-    problem_text: string;
-    correct_answer: number;
-    difficulty: string;
-    topic: string;
-  };
+   math_problem_sessions: {
+     id: string;
+     problem_text: string;
+     correct_answer: number;
+     difficulty: string;
+     topic: string;
+     problem_type: string;
+   };
 }
 
 export default function Home() {
