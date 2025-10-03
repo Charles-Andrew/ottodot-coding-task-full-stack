@@ -33,9 +33,9 @@ export async function POST(request: NextRequest) {
 The correct answer is: ${session.correct_answer}
 The student answered: ${user_answer}
 
-${isCorrect ? 'The student got it correct! Provide encouraging feedback and perhaps suggest a similar problem to try.' : 'The student got it wrong. Explain the correct approach step-by-step, be encouraging, and suggest practicing similar problems.'}
+${isCorrect ? 'The student got it correct! Provide encouraging feedback that explains why their approach worked.' : 'The student got it wrong. Explain the correct approach step-by-step and be encouraging.'}
 
-Keep your response concise, friendly, and age-appropriate for Primary 5 students (10-11 years old).`;
+Keep your response concise, friendly, and age-appropriate for Primary 5 students (10-11 years old). Focus only on explaining this specific problem.`;
 
     const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' });
     const result = await model.generateContent(feedbackPrompt);
