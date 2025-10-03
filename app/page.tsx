@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   CheckIcon,
   XIcon,
@@ -65,6 +65,14 @@ export default function Home() {
   >("easy");
   const [currentProblemDifficulty, setCurrentProblemDifficulty] =
     useState<string>("");
+  const [currentProblemType, setCurrentProblemType] = useState<string>("");
+
+  // Problem type and topic filtering state
+  const [selectedProblemType, setSelectedProblemType] = useState<
+    "random" | "addition" | "subtraction" | "multiplication" | "division"
+  >("random");
+  const [selectedTopic, setSelectedTopic] = useState<string>("");
+  const [topics, setTopics] = useState<string[]>([]);
 
   // Session state management
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -116,6 +124,15 @@ export default function Home() {
     }, 3000); // Hide after 3 seconds
   };
 
+  // Function to get filtered topics based on problem type
+  const getFilteredTopics = useCallback((allTopics: string[], problemType: string): string[] => {
+    // For now, return all topics since most math topics can work with any operation
+    // The AI will generate appropriate problems based on the topic and operation type
+    return allTopics;
+  }, []);
+
+
+
   // Disable body scroll when modal is open
   useEffect(() => {
     if (isHistoryOpen) {
@@ -152,6 +169,14 @@ export default function Home() {
               setSessionId(data.sessionId);
               setTopic(problemData.topic || "");
               setCurrentProblemDifficulty(problemData.difficulty || "N/A");
+              setCurrentProblemType(problemData.problem_type || "");
+              // Restore filter selections from localStorage
+              if (data.problem_type) {
+                setSelectedProblemType(data.problem_type);
+              }
+              if (data.topic) {
+                setSelectedTopic(data.topic);
+              }
             } else {
               // Problem not found or expired, clear localStorage
               localStorage.removeItem("current_math_problem");
@@ -207,6 +232,46 @@ export default function Home() {
     loadSession();
   }, []);
 
+  // Load topics from JSON file on mount
+  useEffect(() => {
+    const loadTopics = async () => {
+      try {
+        const res = await fetch("/data/primary-5-topics.json");
+        if (res.ok) {
+          const data = await res.json();
+          setTopics(data.primary_5_topics);
+        }
+      } catch (error) {
+        console.warn("Failed to load topics:", error);
+      }
+    };
+
+    loadTopics();
+  }, []);
+
+  // Set default topic on initial load only
+  useEffect(() => {
+    if (topics.length > 0 && selectedTopic === "") {
+      // Only set default topic if none is selected yet (initial load)
+      const filteredTopics = getFilteredTopics(topics, selectedProblemType);
+      if (filteredTopics.length > 0) {
+        setSelectedTopic(filteredTopics[0]);
+      }
+    }
+  }, [topics, selectedProblemType, selectedTopic, getFilteredTopics]);
+
+  // Function to get random problem type
+  const getRandomProblemType = (): "addition" | "subtraction" | "multiplication" | "division" => {
+    const types = ["addition", "subtraction", "multiplication", "division"] as const;
+    return types[Math.floor(Math.random() * types.length)];
+  };
+
+  // Function to get random topic
+  const getRandomTopic = (): string => {
+    if (topics.length === 0) return "";
+    return topics[Math.floor(Math.random() * topics.length)];
+  };
+
   const generateProblem = async () => {
     // Clear any existing saved problem
     try {
@@ -217,26 +282,37 @@ export default function Home() {
 
     setIsGenerating(true);
     try {
+      // Resolve random selections
+      const actualProblemType = selectedProblemType === "random" ? getRandomProblemType() : selectedProblemType;
+      const actualTopic = selectedTopic === "random" ? getRandomTopic() : selectedTopic;
+
       const res = await fetch("/api/math-problem", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ difficulty: selectedDifficulty }),
+        body: JSON.stringify({
+          difficulty: selectedDifficulty,
+          problem_type: actualProblemType,
+          topic: actualTopic
+        }),
       });
       if (!res.ok) throw new Error("Failed to generate problem");
       const data = await res.json();
       setCurrentProblemDifficulty(data.difficulty || "N/A");
+      setCurrentProblemType(data.problem_type || "");
       setProblem({ problem_text: data.problem_text, final_answer: 0 });
       setSessionId(data.sessionId);
       setTopic(data.topic || "");
       setFeedback("");
       setIsCorrect(null);
 
-      // Save to localStorage
+      // Save to localStorage (save the actual resolved values, not "random")
       try {
         localStorage.setItem(
           "current_math_problem",
           JSON.stringify({
             sessionId: data.sessionId,
+            problem_type: actualProblemType,
+            topic: actualTopic,
             timestamp: Date.now(),
           })
         );
@@ -261,6 +337,7 @@ export default function Home() {
     // Clear the problem display
     setProblem(null);
     setTopic("");
+    setCurrentProblemType("");
     setHint(null);
     setShowHint(false);
 
@@ -568,6 +645,11 @@ export default function Home() {
             <ProblemGenerator
               selectedDifficulty={selectedDifficulty}
               setSelectedDifficulty={setSelectedDifficulty}
+              selectedProblemType={selectedProblemType}
+              setSelectedProblemType={setSelectedProblemType}
+              selectedTopic={selectedTopic}
+              setSelectedTopic={setSelectedTopic}
+              topics={getFilteredTopics(topics, selectedProblemType)}
               generateProblem={generateProblem}
               isGenerating={isGenerating}
             />
@@ -582,6 +664,7 @@ export default function Home() {
             problem={problem}
             topic={topic}
             currentProblemDifficulty={currentProblemDifficulty}
+            currentProblemType={currentProblemType}
             userAnswer={userAnswer}
             setUserAnswer={setUserAnswer}
             submitAnswer={submitAnswer}

@@ -10,6 +10,7 @@ interface ProblemDisplayProps {
   problem: MathProblem | null;
   topic: string;
   currentProblemDifficulty: string;
+  currentProblemType: string;
   userAnswer: string;
   setUserAnswer: (answer: string) => void;
   submitAnswer: (e: React.FormEvent) => void;
@@ -25,6 +26,7 @@ export const ProblemDisplay = ({
   problem,
   topic,
   currentProblemDifficulty,
+  currentProblemType,
   userAnswer,
   setUserAnswer,
   submitAnswer,
@@ -45,20 +47,27 @@ export const ProblemDisplay = ({
         </div>
         <h2 className="text-2xl font-bold text-white">Problem</h2>
       </div>
-      <div className="mb-4 text-sm text-white/70 bg-gray-800/50 p-3 rounded-lg space-y-1">
-        {topic && (
-          <div>
-            <strong>Topic:</strong> {topic}
-          </div>
-        )}
-        <div>
-          <strong>Difficulty:</strong>{" "}
-          {currentProblemDifficulty
-            ? currentProblemDifficulty.charAt(0).toUpperCase() +
-              currentProblemDifficulty.slice(1)
-            : "N/A"}
-        </div>
-      </div>
+       <div className="mb-4 text-sm text-white/70 bg-gray-800/50 p-3 rounded-lg space-y-1">
+         {currentProblemType && (
+           <div>
+             <strong>Type:</strong>{" "}
+             {currentProblemType.charAt(0).toUpperCase() +
+               currentProblemType.slice(1)}
+           </div>
+         )}
+         {topic && (
+           <div>
+             <strong>Topic:</strong> {topic}
+           </div>
+         )}
+         <div>
+           <strong>Difficulty:</strong>{" "}
+           {currentProblemDifficulty
+             ? currentProblemDifficulty.charAt(0).toUpperCase() +
+               currentProblemDifficulty.slice(1)
+             : "N/A"}
+         </div>
+       </div>
       <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl text-lg leading-relaxed mb-8 border-l-4 border-indigo-500 text-white">
         {problem.problem_text}
       </div>

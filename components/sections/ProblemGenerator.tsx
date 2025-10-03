@@ -2,10 +2,16 @@ import { SparklesIcon } from "@/components/icons";
 import { LoadingSpinner } from "@/components/ui/loading";
 
 type Difficulty = "easy" | "medium" | "hard";
+type ProblemType = "random" | "addition" | "subtraction" | "multiplication" | "division";
 
 interface ProblemGeneratorProps {
   selectedDifficulty: Difficulty;
   setSelectedDifficulty: (difficulty: Difficulty) => void;
+  selectedProblemType: ProblemType;
+  setSelectedProblemType: (type: ProblemType) => void;
+  selectedTopic: string;
+  setSelectedTopic: (topic: string) => void;
+  topics: string[];
   generateProblem: () => void;
   isGenerating: boolean;
 }
@@ -13,11 +19,33 @@ interface ProblemGeneratorProps {
 export const ProblemGenerator = ({
   selectedDifficulty,
   setSelectedDifficulty,
+  selectedProblemType,
+  setSelectedProblemType,
+  selectedTopic,
+  setSelectedTopic,
+  topics,
   generateProblem,
   isGenerating,
 }: ProblemGeneratorProps) => {
   return (
     <div className="bg-black/80 rounded-3xl p-6 md:p-8 mb-8 shadow-2xl backdrop-blur-xl border border-white/10 bg-gradient-to-br from-indigo-500/15 to-purple-600/15">
+      <div className="mb-6">
+        <label className="block font-semibold text-lg mb-3 text-white">
+          Select Problem Type
+        </label>
+        <select
+          value={selectedProblemType}
+          onChange={(e) => setSelectedProblemType(e.target.value as ProblemType)}
+          className="w-full p-3 rounded-xl bg-gray-800 text-white border border-gray-600 focus:border-indigo-500 focus:outline-none transition-colors"
+        >
+          <option value="random">Random</option>
+          <option value="addition">Addition</option>
+          <option value="subtraction">Subtraction</option>
+          <option value="multiplication">Multiplication</option>
+          <option value="division">Division</option>
+        </select>
+      </div>
+
       <div className="mb-6">
         <label className="block font-semibold text-lg mb-3 text-white">
           Select Difficulty Level
@@ -42,6 +70,25 @@ export const ProblemGenerator = ({
           ))}
         </div>
       </div>
+
+      <div className="mb-6">
+        <label className="block font-semibold text-lg mb-3 text-white">
+          Select Topic
+        </label>
+        <select
+          value={selectedTopic}
+          onChange={(e) => setSelectedTopic(e.target.value)}
+          className="w-full p-3 rounded-xl bg-gray-800 text-white border border-gray-600 focus:border-indigo-500 focus:outline-none transition-colors"
+        >
+          <option value="random">Random</option>
+          {topics.map((topic) => (
+            <option key={topic} value={topic}>
+              {topic}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <button
         onClick={generateProblem}
         disabled={isGenerating}
