@@ -67,7 +67,7 @@ Return ONLY this JSON format: {"problem_text": "the problem text", "final_answer
 
     const { data: session, error } = await supabase
       .from('math_problem_sessions')
-      .insert({ problem_text: data.problem_text, correct_answer: data.final_answer, difficulty: selectedDifficulty, problem_type: problem_type, topic: selectedTopic })
+      .insert({ problem_text: data.problem_text, correct_answer: data.final_answer, difficulty: selectedDifficulty, problem_type: problem_type, topic: topic })
       .select('id')
       .single();
 
@@ -76,7 +76,7 @@ Return ONLY this JSON format: {"problem_text": "the problem text", "final_answer
       throw new Error(`Database insert failed: ${error.message}`);
     }
 
-    return NextResponse.json({ sessionId: session.id, problem_text: data.problem_text, problem_type: problem_type, topic: selectedTopic, difficulty: selectedDifficulty });
+    return NextResponse.json({ sessionId: session.id, problem_text: data.problem_text, problem_type: problem_type, topic: topic, difficulty: selectedDifficulty });
   } catch (error) {
     console.error('Error in generate-problem:', error);
     return NextResponse.json({

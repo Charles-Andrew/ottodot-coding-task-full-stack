@@ -168,7 +168,8 @@ export default function Home() {
                 final_answer: 0,
               });
               setSessionId(data.sessionId);
-              setTopic(problemData.topic || "");
+              // Map topic key to display name for UI display
+              setTopic(problemData.topic ? (topicMapping[problemData.topic] || problemData.topic) : "");
               setCurrentProblemDifficulty(problemData.difficulty || "N/A");
               setCurrentProblemType(problemData.problem_type || "");
               // Note: Filter selections (problem type, topic, difficulty) are not restored from localStorage
@@ -188,7 +189,7 @@ export default function Home() {
     };
 
     loadSavedProblem();
-  }, []);
+  }, [topicMapping]);
 
   // Load saved session from localStorage on mount
   useEffect(() => {
@@ -258,7 +259,7 @@ export default function Home() {
         setSelectedTopic(filteredTopics[0]);
       }
     }
-  }, [topics, selectedProblemType, selectedTopic, getFilteredTopics]);
+  }, [topics, selectedProblemType, selectedTopic, getFilteredTopics, topicMapping]);
 
   // Function to get random problem type
   const getRandomProblemType = (): "addition" | "subtraction" | "multiplication" | "division" => {
@@ -301,7 +302,8 @@ export default function Home() {
       setCurrentProblemType(data.problem_type || "");
       setProblem({ problem_text: data.problem_text, final_answer: 0 });
       setSessionId(data.sessionId);
-      setTopic(data.topic || "");
+      // Map topic key to display name for UI display
+      setTopic(data.topic ? (topicMapping[data.topic] || data.topic) : "");
       setFeedback("");
       setIsCorrect(null);
 
@@ -686,6 +688,7 @@ export default function Home() {
           totalHistoryPages={totalHistoryPages}
           isLoadingHistory={isLoadingHistory}
           onFetchHistory={fetchHistory}
+          topicMapping={topicMapping}
         />
 
         <FeedbackModal

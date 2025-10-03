@@ -25,6 +25,7 @@ interface HistoryModalProps {
   totalHistoryPages: number;
   isLoadingHistory: boolean;
   onFetchHistory: (page: number) => void;
+  topicMapping: Record<string, string>;
 }
 
 export const HistoryModal = ({
@@ -35,6 +36,7 @@ export const HistoryModal = ({
   totalHistoryPages,
   isLoadingHistory,
   onFetchHistory,
+  topicMapping,
 }: HistoryModalProps) => {
   if (!isOpen) return null;
 
@@ -107,7 +109,7 @@ export const HistoryModal = ({
                         <div className="flex gap-2 mb-2">
                           {submission.math_problem_sessions.topic && (
                             <span className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded text-xs">
-                              {submission.math_problem_sessions.topic}
+                              {topicMapping[submission.math_problem_sessions.topic] || submission.math_problem_sessions.topic}
                             </span>
                           )}
                           <span
