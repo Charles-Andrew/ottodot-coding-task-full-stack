@@ -1,5 +1,16 @@
 @import 'katex/dist/katex.min.css';
 
+/* KaTeX container constraints */
+.katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.katex {
+  font-size: 1em;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

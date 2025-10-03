@@ -175,12 +175,12 @@ export const HistoryModal = ({
                        <summary className="text-blue-400 cursor-pointer hover:text-blue-300 text-sm">
                          Show feedback
                        </summary>
-                       <div className="mt-2 p-3 bg-black/30 rounded text-sm">
-                         <SafeHtmlWithMath
-                           html={submission.feedback_text}
-                           className="text-white/90 leading-relaxed prose prose-invert max-w-none"
-                         />
-                       </div>
+                        <div className="mt-2 p-3 bg-black/30 rounded text-sm overflow-x-auto">
+                          <SafeHtmlWithMath
+                            html={submission.feedback_text}
+                            className="text-white/90 leading-relaxed prose prose-invert min-w-0"
+                          />
+                        </div>
                      </details>
                   </div>
                 ))}

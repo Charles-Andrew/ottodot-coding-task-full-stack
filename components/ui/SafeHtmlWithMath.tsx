@@ -17,7 +17,9 @@ export const SafeHtmlWithMath = ({ html, className = '' }: SafeHtmlWithMathProps
           return katex.renderToString(math.trim(), {
             displayMode: true,
             throwOnError: false,
-            errorColor: '#ff6b6b'
+            errorColor: '#ff6b6b',
+            fleqn: true,
+            leqno: false
           });
         } catch {
           return `<span style="color: #ff6b6b;">Math error: ${math}</span>`;
@@ -30,7 +32,9 @@ export const SafeHtmlWithMath = ({ html, className = '' }: SafeHtmlWithMathProps
           return katex.renderToString(math.trim(), {
             displayMode: false,
             throwOnError: false,
-            errorColor: '#ff6b6b'
+            errorColor: '#ff6b6b',
+            fleqn: true,
+            leqno: false
           });
         } catch {
           return `<span style="color: #ff6b6b;">Math error: ${math}</span>`;
