@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     // Check if session exists and get current data
     const { data: session, error: fetchError } = await supabase
       .from('user_sessions')
-      .select('correct_count, total_count, streak, last_accessed_at')
+      .select('correct_count, total_count, streak, hint_credits, hint_cap, last_accessed_at')
       .eq('id', session_id)
       .single();
 
@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
       correct_count: session.correct_count,
       total_count: session.total_count,
       streak: session.streak,
+      hint_credits: session.hint_credits,
+      hint_cap: session.hint_cap,
       last_accessed_at: session.last_accessed_at
     });
   } catch (error) {
