@@ -186,30 +186,31 @@ export const HistoryModal = ({
                 ))}
               </div>
 
-               {/* Pagination */}
-               {totalHistoryPages > 1 && (
-                 <div className="flex items-center justify-center gap-2">
-                   <button
-                     onClick={() => onFetchHistory(currentHistoryPage - 1)}
-                     disabled={currentHistoryPage === 1}
-                     className="w-10 h-10 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center text-xl"
-                     title="Previous page"
-                   >
-                     ‹
-                   </button>
-                   <span className="text-white/70">
-                     Page {currentHistoryPage} of {totalHistoryPages}
-                   </span>
-                   <button
-                     onClick={() => onFetchHistory(currentHistoryPage + 1)}
-                     disabled={currentHistoryPage === totalHistoryPages}
-                     className="w-10 h-10 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center text-xl"
-                     title="Next page"
-                   >
-                     ›
-                   </button>
-                 </div>
-               )}
+                {/* Pagination */}
+                {totalHistoryPages > 1 && (
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => onFetchHistory(currentHistoryPage - 1)}
+                      disabled={currentHistoryPage === 1}
+                      className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center text-lg sm:text-xl"
+                      title="Previous page"
+                    >
+                      ‹
+                    </button>
+                    <span className="text-white/70 text-sm sm:text-base">
+                      <span className="sm:hidden">{currentHistoryPage}/{totalHistoryPages}</span>
+                      <span className="hidden sm:inline">Page {currentHistoryPage} of {totalHistoryPages}</span>
+                    </span>
+                    <button
+                      onClick={() => onFetchHistory(currentHistoryPage + 1)}
+                      disabled={currentHistoryPage === totalHistoryPages}
+                      className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center text-lg sm:text-xl"
+                      title="Next page"
+                    >
+                      ›
+                    </button>
+                  </div>
+                )}
             </>
           )}
         </div>
