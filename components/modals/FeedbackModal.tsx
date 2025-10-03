@@ -1,4 +1,5 @@
 import { MathIcon } from "@/components/icons";
+import { SafeHtmlWithMath } from "@/components/ui/SafeHtmlWithMath";
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -42,15 +43,18 @@ export const FeedbackModal = ({
               <h2 className="text-2xl font-bold text-white mb-4">
                 {isCorrect ? "Excellent Work! 🎉" : "Keep Trying! 💪"}
               </h2>
-               <div
-                 className="bg-black/50 p-4 rounded-xl text-left mb-6 max-h-60 overflow-y-auto"
-                 style={{
-                   scrollbarWidth: "thin",
-                   scrollbarColor: "#4B5563 #1F2937",
-                 }}
-               >
-                <p className="text-white/90 leading-relaxed">{feedback}</p>
-              </div>
+                <div
+                  className="bg-black/50 p-4 rounded-xl text-left mb-6 max-h-60 overflow-y-auto"
+                  style={{
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "#4B5563 #1F2937",
+                  }}
+                >
+                 <SafeHtmlWithMath
+                   html={feedback}
+                   className="text-white/90 leading-relaxed prose prose-invert max-w-none"
+                 />
+               </div>
               <button
                 onClick={onClose}
                 className="w-full font-semibold text-lg p-3 rounded-xl cursor-pointer transition-all duration-300 bg-gradient-to-br from-gray-500 to-gray-700 text-white hover:bg-gradient-to-br hover:from-gray-600 hover:to-gray-800"

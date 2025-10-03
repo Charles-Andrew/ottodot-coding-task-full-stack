@@ -33,9 +33,13 @@ export async function POST(request: NextRequest) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    const prompt = selectedTopic
-      ? `Generate a ${selectedDifficulty} level math word problem suitable for a Primary 5 student on the topic: ${selectedTopic}. Return only valid JSON with no extra text or formatting: {"problem_text": "[word problem]", "final_answer": [numerical answer]}`
-      : `Generate a ${selectedDifficulty} level math word problem suitable for a Primary 5 student. Return only valid JSON with no extra text or formatting: {"problem_text": "[word problem]", "final_answer": [numerical answer]}`;
+    const prompt = `Generate a ${selectedDifficulty} level math word problem suitable for a Primary 5 student${selectedTopic ? ` on the topic: ${selectedTopic}` : ''}.
+
+Return ONLY this JSON format: {"problem_text": "the problem text", "final_answer": 4.65}
+- problem_text: the math problem as a string
+- final_answer: number (decimals OK, no fractions, no quotes)
+- Problem must specify units for the answer
+`;
 
     const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' });
     const result = await model.generateContent(prompt);

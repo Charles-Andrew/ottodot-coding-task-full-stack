@@ -70,9 +70,21 @@ export async function POST(request: NextRequest) {
 The correct answer is: ${session.correct_answer}
 The student answered: ${user_answer}
 
-${isCorrect ? 'The student got it correct! Provide encouraging feedback that explains why their approach worked.' : 'The student got it wrong. Explain the correct approach step-by-step and be encouraging.'}
+${isCorrect ? 'The student got it correct! Provide encouraging feedback.' : 'The student got it wrong. Explain the correct approach.'}
 
-Keep your response concise, friendly, and age-appropriate for Primary 5 students (10-11 years old). Focus only on explaining this specific problem.`;
+Provide step-by-step solutions using simple HTML formatting:
+
+- Use <ol> for numbered steps, with each <li> starting as: <strong>Step X.</strong> (where X is the step number)
+- Apply <strong> for emphasis on key terms
+- Format mathematics:
+  - Inline math: $...$ (e.g., $2 + 3 = 5$)
+  - Display math: $$...$$ (e.g., $$\frac{1}{2}$$)
+- Use simple fractions and basic operations
+- Add <br> tags between elements for proper vertical spacing:
+  - Place <br> after each step, between paragraphs, and around mathematical expressions
+  - Use double <br><br> before <ol> tags (e.g., <br><br><ol>)
+
+Format your response as clean HTML that can be safely rendered. Keep explanations age-appropriate for 10-11 year olds.`;
 
     const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' });
     const result = await model.generateContent(feedbackPrompt);
