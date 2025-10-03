@@ -546,7 +546,7 @@ export default function Home() {
           isLoadingSession={isLoadingSession}
         />
 
-        {currentSessionId && (
+        {currentSessionId && !(isInitialLoading && !currentSessionId || isCreatingSession || isJoiningSession) && (
           <ProblemGenerator
             selectedDifficulty={selectedDifficulty}
             setSelectedDifficulty={setSelectedDifficulty}
@@ -555,15 +555,17 @@ export default function Home() {
           />
         )}
 
-        <ProblemDisplay
-          problem={problem}
-          topic={topic}
-          currentProblemDifficulty={currentProblemDifficulty}
-          userAnswer={userAnswer}
-          setUserAnswer={setUserAnswer}
-          submitAnswer={submitAnswer}
-          isSubmitting={isSubmitting}
-        />
+        {!(isInitialLoading && !currentSessionId || isCreatingSession || isJoiningSession) && (
+          <ProblemDisplay
+            problem={problem}
+            topic={topic}
+            currentProblemDifficulty={currentProblemDifficulty}
+            userAnswer={userAnswer}
+            setUserAnswer={setUserAnswer}
+            submitAnswer={submitAnswer}
+            isSubmitting={isSubmitting}
+          />
+        )}
 
         <HistoryModal
           isOpen={isHistoryOpen}
