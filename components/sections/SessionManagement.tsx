@@ -4,7 +4,8 @@ import { LoadingSpinner } from "@/components/ui/loading";
 
 interface SessionManagementProps {
   currentSessionId: string | null;
-  isLoadingSession: boolean;
+  isCreatingLoading: boolean;
+  isJoiningLoading: boolean;
   isInitialLoading: boolean;
   joinSessionId: string;
   setJoinSessionId: (id: string) => void;
@@ -16,7 +17,8 @@ interface SessionManagementProps {
 
 export const SessionManagement = ({
   currentSessionId,
-  isLoadingSession,
+  isCreatingLoading,
+  isJoiningLoading,
   isInitialLoading,
   joinSessionId,
   setJoinSessionId,
@@ -63,29 +65,32 @@ export const SessionManagement = ({
 
       {currentSessionId && (
         <div className="mb-4">
-          <button
-            onClick={endSession}
-            disabled={isLoadingSession}
-            className="w-full px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
-          >
-            {isLoadingSession && <LoadingSpinner />}
-            <EndIcon />
-            End Session
-          </button>
+           <button
+             onClick={endSession}
+             className="w-full px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+           >
+             <EndIcon />
+             End Session
+           </button>
         </div>
       )}
 
       {!currentSessionId && (
         <div className="flex flex-col sm:flex-row gap-4">
-          <button
-            onClick={createNewSession}
-            disabled={isLoadingSession}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
-          >
-            {isLoadingSession && <LoadingSpinner />}
-            <PlusIcon />
-            New Session
-          </button>
+           <button
+             onClick={createNewSession}
+             disabled={isCreatingLoading}
+             className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+           >
+             {isCreatingLoading ? (
+               <LoadingSpinner />
+             ) : (
+               <>
+                 <PlusIcon />
+                 New Session
+               </>
+             )}
+           </button>
 
           <div className="flex-1 flex flex-col gap-2 sm:flex-row">
             <input
@@ -99,15 +104,20 @@ export const SessionManagement = ({
             <button
               onClick={joinSession}
               disabled={
-                isLoadingSession ||
+                isJoiningLoading ||
                 !joinSessionId ||
                 joinSessionId.length !== 5
               }
               className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
             >
-              {isLoadingSession && <LoadingSpinner />}
-              <JoinIcon />
-              Join
+              {isJoiningLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  <JoinIcon />
+                  Join
+                </>
+              )}
             </button>
           </div>
         </div>
